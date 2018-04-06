@@ -21,9 +21,3 @@ def insert_data(columns,data,table):
     session.execute( query,data  )
 
 
-
-
-if __name__ == '__main__':
-    insert_data(['lol','d'],['xd',1],'kwejk')
-
-
