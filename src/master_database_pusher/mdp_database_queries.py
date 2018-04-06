@@ -8,7 +8,7 @@ cfg.read('../../main.conf')
 
 def insert_data(columns,data,table):
     cluster = Cluster()
-    session = cluster.connect('tutorial')
+    session = cluster.connect(cfg["DATABASE"]['keyspace_md'])
 
     query = "INSERT INTO {} (".format(table)
     for col in columns:
@@ -18,9 +18,12 @@ def insert_data(columns,data,table):
     for col in columns:
         query+=' %s,'.format(col)
     query=query[:-1]+')'
-    print(query)
+    session.execute( query,data  )
+
 
 
 
 if __name__ == '__main__':
     insert_data(['lol','d'],['xd',1],'kwejk')
+
+
