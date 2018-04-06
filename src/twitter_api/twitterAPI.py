@@ -40,20 +40,22 @@ class TwitterStreamProcessor(tweepy.StreamListener):
         tweepy.StreamListener.__init__(self)
         
     def processStatus(self,status,twitterTrackNames):
-        def findTrackname(twitterTrackNames,text):
-            foundNames=[]
+        def findTrackname(twitterTrackNames, text):
+            foundNames = []
+            tmpText = text
+            tmpText = tmpText.lower()
             for trackName in twitterTrackNames:
-                if trackName in text:
+                if trackName in tmpText:
                     foundNames.append(trackName)
             return foundNames
-        
+
         dic= {}
         dic['tweetID'] = int(status.id_str)
         dic['userID'] = int(status.user.id_str)
         dic['userName']= status.user.name
-        dic['location']=status.user.location
-        dic['timeZone']=status.user.time_zone
-        dic['createTime']=status.created_at
+        dic['location']= status.user.location
+        dic['time_zone']= status.user.time_zone
+        dic['createtime']= int(status.created_at.strftime('%s'))
         dic['lang']=status.lang
         dic['tweet_text']=status.text
         tmp = findTrackname(twitterTrackNames,status.text)
