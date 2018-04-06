@@ -1,6 +1,6 @@
 CREATE KEYSPACE IF NOT EXISTS twitter_mdp WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
-USE twitter_mdp
-CREATE TABLE metoo(
+USE twitter_mdp;
+CREATE TABLE IF NOT EXISTS metoo(
    tweetID INT PRIMARY KEY,
    userID INT,
    location TEXT,
