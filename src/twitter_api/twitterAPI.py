@@ -1,7 +1,10 @@
 import tweepy
+import sys
+sys.path.append('../master_database_pusher/')
 from multiprocessing import Process
 from configparser import ConfigParser as ConfPar
 from trackNames import trackNames
+import mdp_database_queries as mdq
 
 def loadTwitterKeysFromConfig():
     config = ConfPar()
@@ -27,8 +30,10 @@ def startStreaming():
     api=getTwitterApi()
     twitterStream=getStreamListener(api)
     twitterStream.filter(track=trackNames)
+    twitterStream.twitterTrackNames=trackNames
     
 class TwitterStreamProcessor(tweepy.StreamListener):
+    twitterTrackNames=[]
     def processStatus(self,status):
         dic= {}
         dic['tweetID'] = status.id_str
@@ -39,7 +44,7 @@ class TwitterStreamProcessor(tweepy.StreamListener):
         dic['createTime']=status.created_at
         dic['lang']=status.lang
         dic['tweet_text']=status.text
-        print(dic)
+        mdq.insert_twitter_dic(dic,twitterTrackNames)
 
     def on_status(self, status):
         p = Process(target=self.processStatus, args=(status,))
