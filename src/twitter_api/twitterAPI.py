@@ -1,6 +1,7 @@
 import tweepy
 import sys
 import time
+import datetime
 sys.path.append('../master_database_pusher/')
 from multiprocessing import Process, Queue
 from configparser import ConfigParser as ConfPar
@@ -71,15 +72,37 @@ class TwitterStreamProcessor(tweepy.StreamListener):
         p.start()
         
 ###################
-def RealTimeCollector(queue,collectingTime=10):
-    start = time.time()
-    time.clock()
-    elapsed = 0
-    while elapsed < collectingTime:
-        elapsed = time.time() - start
-        if not queue.empty():
-            print(queue.get())
+def getTweetLang(langDic,tweet):
+    if tweet['lang'] in langDic:
+        langDic[tweet['lang']]=langDic[tweet['lang']]+1
+    else:
+        langDic[tweet['lang']]=1
 
+
+def RealTimeCollector(queue,collectingTime=10):
+    open('counterData.txt', 'w').close()
+    open('langData.txt','w').close()
+    while True:
+        start = time.time()
+        time.clock()
+        elapsed = 0
+        counter=0
+        langDic={}
+        while elapsed < collectingTime:
+            elapsed = time.time() - start
+            if not queue.empty():
+                tweet=queue.get()
+                getTweetLang(langDic,tweet)
+                counter=counter+1
+                
+        print("SAVING...")
+        with open("counterData.txt", "a") as myfile:
+            myfile.write(str(datetime.datetime.now())+'='+str(counter)+"\n")
+        with open("langData.txt", "a") as myfile:
+            myfile.write(str(datetime.datetime.now())+'='+str(langDic)+"\n")
+
+
+        
 p1=Process(target=RealTimeCollector,args=(globalQueue,))
 p1.start()
 startStreaming()
