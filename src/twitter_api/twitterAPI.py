@@ -60,10 +60,11 @@ class TwitterStreamProcessor(tweepy.StreamListener):
         dic['createtime']= int(status.created_at.strftime('%s'))
         dic['lang']=status.lang
         dic['tweet_text']=status.text
+        
         tmp = findTrackname(twitterTrackNames,status.text)
         if not tmp==[]:
             print(tmp[0])
-            dataStore.put([ dic,tmp[0] ])
+            dataStore.put([ dic,tmp[0],int(status.user.followers_count) ])
             #mdq.insert_twitter_dic(dic,tmp[0])
         
         
@@ -84,7 +85,8 @@ def addTweetTag(tagDic,tag):
     else:
         tagDic[tag]=1
 
-def saveData(counter,langDic,tagDic):
+
+def saveData(counter,langDic,tagDic,folDic):
     print("SAVING...")
     time=datetime.datetime.now()
     with open("../../data/real_time/counterData.txt", "a") as File:
@@ -93,10 +95,14 @@ def saveData(counter,langDic,tagDic):
         File.write(str(time)+'='+str(langDic)+"\n")
     with open("../../data/real_time/tagData.txt", "a") as File:
         File.write(str(time)+'='+str(tagDic)+"\n")
-
+    with open("../../data/real_time/folData.txt", "a") as File:
+        File.write(str(time)+'='+str(folDic)+"\n")
+        
 def RealTimeCollector(queue,collectingTime=10):
     open('../../data/real_time/counterData.txt', 'w').close()
     open('../../data/real_time/langData.txt','w').close()
+    open('../../data/real_time/tagData.txt','w').close()
+    open('../../data/real_time/folData.txt','w').close()
     while True:
         start = time.time()
         time.clock()
@@ -104,6 +110,7 @@ def RealTimeCollector(queue,collectingTime=10):
         counter=0
         langDic={}
         tagDic={}
+        folDic={}
         while elapsed < collectingTime:
             elapsed = time.time() - start
             if not queue.empty():
@@ -111,8 +118,9 @@ def RealTimeCollector(queue,collectingTime=10):
                 tweet=queuelist[0]
                 addTweetTag(tagDic,queuelist[1])
                 getTweetLang(langDic,tweet)
+                folDic[tweet['userID']]=queuelist[2]
                 counter=counter+1
-        saveData(langDic,counter,tagDic)
+        saveData(counter,langDic,tagDic,folDic)
 
 
         
