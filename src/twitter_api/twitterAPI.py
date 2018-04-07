@@ -6,7 +6,7 @@ sys.path.append('../master_database_pusher/')
 from multiprocessing import Process, Queue
 from configparser import ConfigParser as ConfPar
 from trackNames import trackNames
-import mdp_database_queries as mdq
+#import mdp_database_queries as mdq
 globalQueue = Queue()
 
 def loadTwitterKeysFromConfig():
@@ -63,8 +63,8 @@ class TwitterStreamProcessor(tweepy.StreamListener):
         tmp = findTrackname(twitterTrackNames,status.text)
         if not tmp==[]:
             print(tmp[0])
-            dataStore.put(dic)
-            mdq.insert_twitter_dic(dic,tmp[0])
+            dataStore.put([ dic,tmp[0] ])
+            #mdq.insert_twitter_dic(dic,tmp[0])
         
         
     def on_status(self, status):
@@ -78,28 +78,41 @@ def getTweetLang(langDic,tweet):
     else:
         langDic[tweet['lang']]=1
 
+def addTweetTag(tagDic,tag):
+    if tag in tagDic:
+        tagDic[tag]=tagDic[tag]+1
+    else:
+        tagDic[tag]=1
+
+def saveData(counter,langDic,tagDic):
+    print("SAVING...")
+    time=datetime.datetime.now()
+    with open("../../data/real_time/counterData.txt", "a") as File:
+        File.write(str(time)+'='+str(counter)+"\n")
+    with open("../../data/real_time/langData.txt", "a") as File:
+        File.write(str(time)+'='+str(langDic)+"\n")
+    with open("../../data/real_time/tagData.txt", "a") as File:
+        File.write(str(time)+'='+str(tagDic)+"\n")
 
 def RealTimeCollector(queue,collectingTime=10):
-    open('counterData.txt', 'w').close()
-    open('langData.txt','w').close()
+    open('../../data/real_time/counterData.txt', 'w').close()
+    open('../../data/real_time/langData.txt','w').close()
     while True:
         start = time.time()
         time.clock()
         elapsed = 0
         counter=0
         langDic={}
+        tagDic={}
         while elapsed < collectingTime:
             elapsed = time.time() - start
             if not queue.empty():
-                tweet=queue.get()
+                queuelist=queue.get()
+                tweet=queuelist[0]
+                addTweetTag(tagDic,queuelist[1])
                 getTweetLang(langDic,tweet)
                 counter=counter+1
-                
-        print("SAVING...")
-        with open("counterData.txt", "a") as myfile:
-            myfile.write(str(datetime.datetime.now())+'='+str(counter)+"\n")
-        with open("langData.txt", "a") as myfile:
-            myfile.write(str(datetime.datetime.now())+'='+str(langDic)+"\n")
+        saveData(langDic,counter,tagDic)
 
 
         
