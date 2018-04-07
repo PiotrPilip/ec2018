@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   <meta charset="utf-8" />
+   <title></title>
+
+   <!-- import plugin script -->
+   <script src='static/Chart.min.js'></script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="{{
+  url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+
+</head>
+<body>
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/">All</a>
+      </li>
+            <li class="nav-item">
+        <a class="nav-link" href="/table">Table</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/chart">Chart</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="/metoo">#metoo</a>
+          <a class="dropdown-item" href="/china">#china</a>
+          <a class="dropdown-item" href="/usa">#china</a>
+          <a class="dropdown-item" href="/puppy">#puppy</a>
+          <a class="dropdown-item" href="/look">#look</a>
+          <a class="dropdown-item" href="/rest">#rest</a>
+          <a class="dropdown-item" href="/coffe">#coffe</a>
+          <a class="dropdown-item" href="/nerd">#nerd</a>
+          <a class="dropdown-item" href="/morning">#morning</a>
+          <a class="dropdown-item" href="/love">#love</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+{% block body %}{% endblock %}
+
+</body>
+</html>
