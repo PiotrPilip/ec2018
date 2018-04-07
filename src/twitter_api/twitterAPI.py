@@ -1,10 +1,12 @@
 import tweepy
 import sys
+import time
 sys.path.append('../master_database_pusher/')
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 from configparser import ConfigParser as ConfPar
 from trackNames import trackNames
-import mdp_database_queries as mdq
+#import mdp_database_queries as mdq
+globalQueue = Queue()
 
 def loadTwitterKeysFromConfig():
     config = ConfPar()
@@ -34,12 +36,11 @@ def startStreaming():
     
 class TwitterStreamProcessor(tweepy.StreamListener):
     twitterTrackNames=0
-    
     def __init__(self,trackNames):
         self.twitterTrackNames=trackNames
         tweepy.StreamListener.__init__(self)
         
-    def processStatus(self,status,twitterTrackNames):
+    def processStatus(self,status,twitterTrackNames,dataStore):
         def findTrackname(twitterTrackNames, text):
             foundNames = []
             tmpText = text
@@ -60,12 +61,25 @@ class TwitterStreamProcessor(tweepy.StreamListener):
         dic['tweet_text']=status.text
         tmp = findTrackname(twitterTrackNames,status.text)
         if not tmp==[]:
-            mdq.insert_twitter_dic(dic,tmp[0])
+            print(tmp[0])
+            dataStore.put(dic)
+            #mdq.insert_twitter_dic(dic,tmp[0])
+        
         
     def on_status(self, status):
-        p = Process(target=self.processStatus, args=(status,self.twitterTrackNames,))
+        p = Process(target=self.processStatus, args=(status,self.twitterTrackNames,globalQueue,))
         p.start()
         
+###################
+def RealTimeCollector(queue,collectingTime=10):
+    start = time.time()
+    time.clock()
+    elapsed = 0
+    while elapsed < collectingTime:
+        elapsed = time.time() - start
+        if not queue.empty():
+            print(queue.get())
 
- 
+p1=Process(target=RealTimeCollector,args=(globalQueue,))
+p1.start()
 startStreaming()
