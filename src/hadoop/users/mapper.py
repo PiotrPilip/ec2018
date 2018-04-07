@@ -3,9 +3,9 @@ import sys
 import csv
 
 #configuable!
-LANG_INDEX = 2
+USER_INDEX = 7
 
 
 reader = csv.reader(sys.stdin)
 for row in reader:
-    print("%s;%s" % (row[LANG_INDEX],1))
+    print("%s;%s" % (row[USER_INDEX],1))

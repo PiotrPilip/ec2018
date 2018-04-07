@@ -6,7 +6,7 @@ sys.path.append('../master_database_pusher/')
 from multiprocessing import Process, Queue
 from configparser import ConfigParser as ConfPar
 from trackNames import trackNames
-#import mdp_database_queries as mdq
+import mdp_database_queries as mdq
 globalQueue = Queue()
 
 def loadTwitterKeysFromConfig():
@@ -64,7 +64,7 @@ class TwitterStreamProcessor(tweepy.StreamListener):
         if not tmp==[]:
             print(tmp[0])
             dataStore.put(dic)
-            #mdq.insert_twitter_dic(dic,tmp[0])
+            mdq.insert_twitter_dic(dic,tmp[0])
         
         
     def on_status(self, status):
